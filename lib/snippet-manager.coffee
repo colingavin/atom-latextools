@@ -74,8 +74,13 @@ class SnippetManager extends LTool
 
     te = atom.workspace.getActiveTextEditor()
 
-    # Using Atom's API:
-    te.selectToBeginningOfWord()
+    # Modify the default word regexp to allow a trailing *
+    # (for environments such as 'equation*')
+    cursor = te.getCursors()[0]
+    envRegex = new RegExp("(" + cursor.wordRegExp().source + ")(\\*)?")
+    # Find the environment name and range
+    te.expandSelectionsBackward (selection) ->
+      selection.selectWord({wordRegex:envRegex})
     range = te.getSelectedBufferRange()
     arg = te.getTextInBufferRange(range)
     te.setSelectedBufferRange(range, '')
